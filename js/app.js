@@ -20,14 +20,14 @@ async function main(){
   //create a web-GPU context
   const canvas = document.querySelector('canvas');
   const context = canvas.getContext('webgpu');
-  const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
   context.configure({
     device,
     format: presentationFormat
   })
   //shader module definition
   const module = device.createShaderModule({
-    label: "RED_TRIANGEL_SHADERS",
+    label: "RED_TRIANGLE_SHADERS",
     code: await loadGLSL("./js/shader_module.wgsl")
   })
 
@@ -70,7 +70,7 @@ async function main(){
     pass.setPipeline(pipeline);
     pass.draw(3);
     pass.end();
-    
+
     const commandBuffer = encoder.finish();
     //this is the point of exection of comamnd buffer.
     device.queue.submit([commandBuffer]);
@@ -79,8 +79,11 @@ async function main(){
   const observer = new ResizeObserver(entries=>{
     for (const entry of entries) {
       const canvas = entry.target;
-      const width = entry.contentBoxSize[0].inlineSize;
-      const height = entry.contentBoxSize[0].blockSize;
+      const width = entry.contentBoxSize[0].inlineSize;//width of observed.
+      const height = entry.contentBoxSize[0].blockSize;//height of observed.
+
+      // device.limits.maxTextureDimension2D is a limit likely coming from a WebGPU or WebGL
+      // context that defines the maximum allowable texture size for the device.
       canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
       canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
       render();
